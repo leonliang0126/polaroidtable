@@ -17,14 +17,17 @@ html,
 body {
   width: 100%;
   height: 100%;
+  min-height: 100%;
   margin: 0;
 }
 
 body {
   overflow: hidden;
+  min-height: 100dvh;
   color: var(--ink);
   font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
   background: #f4c681;
+  overscroll-behavior: none;
 }
 
 button {
@@ -35,6 +38,8 @@ button {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  min-height: 100svh;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 0%, rgba(255, 252, 220, 0.95), transparent 42%),
@@ -423,6 +428,7 @@ button {
   z-index: 100;
   display: grid;
   place-items: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(84px, env(safe-area-inset-bottom));
   background: rgba(46, 31, 16, 0.42);
   backdrop-filter: blur(10px);
 }
@@ -432,7 +438,8 @@ button {
 }
 
 .lightbox-photo {
-  width: min(54vh, 76vw);
+  width: min(54dvh, 76vw);
+  max-height: calc(100dvh - 132px);
   aspect-ratio: 196 / 238;
   display: grid;
   place-items: center;
@@ -554,16 +561,21 @@ button {
 
 @media (max-width: 720px) {
   :root {
-    --paper-w: 148px;
-    --paper-h: 180px;
-    --photo-w: 126px;
-    --photo-h: 126px;
+    --paper-w: clamp(132px, 39vw, 148px);
+    --paper-h: clamp(160px, 47vw, 180px);
+    --photo-w: clamp(112px, 33vw, 126px);
+    --photo-h: clamp(112px, 33vw, 126px);
+  }
+
+  .camera-stage {
+    width: 100vw;
+    height: 218px;
   }
 
   .camera {
-    top: -132px;
-    width: min(430px, 110vw);
-    height: 286px;
+    top: -126px;
+    width: min(390px, 96vw);
+    height: 280px;
   }
 
   .lens {
@@ -578,7 +590,7 @@ button {
   }
 
   .upload-button {
-    right: 24px;
+    right: 18px;
     bottom: 4px;
     width: 88px;
     height: 42px;
@@ -590,12 +602,35 @@ button {
   }
 
   .slot {
-    width: min(320px, 82vw);
+    width: min(300px, 78vw);
+    height: 24px;
   }
 
   .dock {
     right: 50%;
-    bottom: 14px;
+    bottom: max(12px, env(safe-area-inset-bottom));
     transform: translateX(50%);
+    max-width: calc(100vw - 24px);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .dock button {
+    min-width: 68px;
+    height: 36px;
+  }
+
+  .lightbox-photo {
+    width: min(82vw, 60dvh);
+    max-height: calc(100dvh - 126px);
+  }
+
+  .lightbox-close {
+    top: max(14px, env(safe-area-inset-top));
+    right: 14px;
+  }
+
+  .lightbox-save {
+    bottom: max(18px, env(safe-area-inset-bottom));
   }
 }
