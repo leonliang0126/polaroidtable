@@ -145,6 +145,7 @@ function bindDrag(card, photo) {
   let baseX = 0;
   let baseY = 0;
   let lastTouchTap = null;
+  let touchStart = null;
 
   card.addEventListener("pointerdown", (event) => {
     selectedId = photo.id;
@@ -170,30 +171,44 @@ function bindDrag(card, photo) {
   });
 
   card.addEventListener("pointerup", (event) => {
-    const moved = Math.hypot(event.clientX - startX, event.clientY - startY);
-    const isTouchTap = event.pointerType === "touch" && moved < 10;
     card.classList.remove("dragging");
     card.releasePointerCapture(event.pointerId);
     savePhotos();
+  });
 
-    if (!isTouchTap) {
+  card.addEventListener("touchstart", (event) => {
+    if (event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    touchStart = { x: touch.clientX, y: touch.clientY };
+  }, { passive: true });
+
+  card.addEventListener("touchend", (event) => {
+    if (!touchStart || event.changedTouches.length !== 1) return;
+    const touch = event.changedTouches[0];
+    const moved = Math.hypot(touch.clientX - touchStart.x, touch.clientY - touchStart.y);
+
+    if (moved >= 10) {
       lastTouchTap = null;
+      touchStart = null;
       return;
     }
 
     const now = event.timeStamp;
     const isDoubleTap = lastTouchTap
       && now - lastTouchTap.time < 320
-      && Math.hypot(event.clientX - lastTouchTap.x, event.clientY - lastTouchTap.y) < 24;
+      && Math.hypot(touch.clientX - lastTouchTap.x, touch.clientY - lastTouchTap.y) < 24;
 
     if (isDoubleTap) {
+      event.preventDefault();
       lastTouchTap = null;
+      touchStart = null;
       openPreview(photo.id);
       return;
     }
 
-    lastTouchTap = { time: now, x: event.clientX, y: event.clientY };
-  });
+    lastTouchTap = { time: now, x: touch.clientX, y: touch.clientY };
+    touchStart = null;
+  }, { passive: false });
 
   card.addEventListener("pointercancel", () => {
     card.classList.remove("dragging");
