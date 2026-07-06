@@ -135,6 +135,7 @@ function renderAll() {
     tabletop.append(card);
 
     bindDrag(card, photo);
+    card.addEventListener("dblclick", () => openPreview(photo.id));
   });
 }
 
@@ -143,60 +144,39 @@ function bindDrag(card, photo) {
   let startY = 0;
   let baseX = 0;
   let baseY = 0;
-  let isDragging = false;
-  let lastTapAt = 0;
 
   card.addEventListener("pointerdown", (event) => {
     selectedId = photo.id;
     photo.z = ++zCounter;
     card.style.zIndex = photo.z;
     document.querySelectorAll(".polaroid").forEach((item) => item.classList.remove("selected"));
-    card.classList.add("selected");
+    card.classList.add("selected", "dragging");
 
     startX = event.clientX;
     startY = event.clientY;
     baseX = photo.x;
     baseY = photo.y;
-    isDragging = false;
     card.setPointerCapture(event.pointerId);
   });
 
   card.addEventListener("pointermove", (event) => {
-    const dx = event.clientX - startX;
-    const dy = event.clientY - startY;
-    if (!isDragging && Math.hypot(dx, dy) < 7) return;
-    if (!isDragging) {
-      isDragging = true;
-      card.classList.add("dragging");
-    }
+    if (!card.classList.contains("dragging")) return;
     const size = getPaperSize();
-    photo.x = clamp(baseX + dx, -size.w * 0.38, window.innerWidth - size.w * 0.62);
-    photo.y = clamp(baseY + dy, 96, window.innerHeight - size.h * 0.54);
+    photo.x = clamp(baseX + event.clientX - startX, -size.w * 0.38, window.innerWidth - size.w * 0.62);
+    photo.y = clamp(baseY + event.clientY - startY, 110, window.innerHeight - size.h * 0.54);
     card.style.setProperty("--x", `${photo.x}px`);
     card.style.setProperty("--y", `${photo.y}px`);
   });
 
   card.addEventListener("pointerup", (event) => {
     card.classList.remove("dragging");
-    if (card.hasPointerCapture(event.pointerId)) card.releasePointerCapture(event.pointerId);
-    if (isDragging) {
-      savePhotos();
-      return;
-    }
-
-    const now = Date.now();
-    if (now - lastTapAt < 340) {
-      lastTapAt = 0;
-      openPreview(photo.id);
-    } else {
-      lastTapAt = now;
-    }
+    card.releasePointerCapture(event.pointerId);
+    savePhotos();
   });
 
-  card.addEventListener("pointercancel", (event) => {
-    isDragging = false;
+  card.addEventListener("pointercancel", () => {
     card.classList.remove("dragging");
-    if (card.hasPointerCapture(event.pointerId)) card.releasePointerCapture(event.pointerId);
+    savePhotos();
   });
 }
 
