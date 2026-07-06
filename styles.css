@@ -595,7 +595,7 @@ button {
 
   .dock {
     right: 50%;
-    bottom: 14px;
+    bottom: calc(30px + env(safe-area-inset-bottom, 0px));
     transform: translateX(50%);
   }
 }
