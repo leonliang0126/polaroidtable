@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Polaroid Desk</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./styles.css?v=20260706-png-contrast-sat" />
+  </head>
+  <body>
+    <main class="desk-app" aria-label="即时相纸桌面">
+      <section class="camera-stage" aria-label="相机">
+        <div class="camera" id="camera">
+          <div class="camera-top">
+            <div class="viewfinder"></div>
+            <div class="lens">
+              <span></span>
+            </div>
+            <button class="upload-button" id="uploadButton" type="button">Upload</button>
+          </div>
+          <div class="stripe" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <div class="slot" aria-hidden="true"></div>
+        </div>
+        <input id="fileInput" class="file-input" type="file" accept="image/*" />
+      </section>
+
+      <section class="tabletop" id="tabletop" aria-label="桌面相纸">
+        <p class="empty-hint" id="emptyHint">把照片拖到桌面，或点顶部按钮</p>
+      </section>
+
+      <nav class="dock" aria-label="工具">
+        <button id="dockUpload" type="button">Upload</button>
+        <button id="saveButton" type="button">Save</button>
+        <button id="clearButton" type="button">Clear</button>
+      </nav>
+
+      <div class="lightbox" id="lightbox" hidden>
+        <button class="lightbox-close" id="closeLightbox" type="button" aria-label="关闭">×</button>
+        <div class="lightbox-photo" id="lightboxPhoto"></div>
+        <button class="lightbox-save" id="lightboxSave" type="button">Save photo</button>
+      </div>
+    </main>
+
+    <script src="./app.js?v=20260706-png-contrast-sat"></script>
+  </body>
+</html>
