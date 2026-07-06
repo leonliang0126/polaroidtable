@@ -418,10 +418,34 @@ async function saveSelectedPhoto() {
   const mimeType = isMobile ? "image/jpeg" : "image/png";
   const extension = isMobile ? "jpg" : "png";
   const dataUrl = await renderPhotoForSave(photo, mimeType);
+  const filename = `instant-photo-${new Date(photo.createdAt).toISOString().slice(0, 10)}.${extension}`;
+
+  if (isMobile) {
+    const file = dataUrlToFile(dataUrl, filename, mimeType);
+    if (typeof navigator.share === "function" && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (error) {
+        if (error.name === "AbortError") return;
+      }
+    }
+  }
+
   const link = document.createElement("a");
   link.href = dataUrl;
-  link.download = `instant-photo-${new Date(photo.createdAt).toISOString().slice(0, 10)}.${extension}`;
+  link.download = filename;
   link.click();
+}
+
+function dataUrlToFile(dataUrl, filename, mimeType) {
+  const [header, data] = dataUrl.split(",");
+  const bytes = atob(data);
+  const array = new Uint8Array(bytes.length);
+  for (let index = 0; index < bytes.length; index += 1) {
+    array[index] = bytes.charCodeAt(index);
+  }
+  return new File([array], filename, { type: mimeType || header.match(/data:([^;]+)/)?.[1] });
 }
 
 function renderPhotoForSave(photo, mimeType = "image/png") {
