@@ -144,6 +144,7 @@ function bindDrag(card, photo) {
   let startY = 0;
   let baseX = 0;
   let baseY = 0;
+  let lastTouchTap = null;
 
   card.addEventListener("pointerdown", (event) => {
     selectedId = photo.id;
@@ -169,9 +170,29 @@ function bindDrag(card, photo) {
   });
 
   card.addEventListener("pointerup", (event) => {
+    const moved = Math.hypot(event.clientX - startX, event.clientY - startY);
+    const isTouchTap = event.pointerType === "touch" && moved < 10;
     card.classList.remove("dragging");
     card.releasePointerCapture(event.pointerId);
     savePhotos();
+
+    if (!isTouchTap) {
+      lastTouchTap = null;
+      return;
+    }
+
+    const now = event.timeStamp;
+    const isDoubleTap = lastTouchTap
+      && now - lastTouchTap.time < 320
+      && Math.hypot(event.clientX - lastTouchTap.x, event.clientY - lastTouchTap.y) < 24;
+
+    if (isDoubleTap) {
+      lastTouchTap = null;
+      openPreview(photo.id);
+      return;
+    }
+
+    lastTouchTap = { time: now, x: event.clientX, y: event.clientY };
   });
 
   card.addEventListener("pointercancel", () => {
