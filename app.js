@@ -414,14 +414,17 @@ function createPreviewCard(photo) {
 async function saveSelectedPhoto() {
   const photo = photos.find((item) => item.id === selectedId) || photos.at(-1);
   if (!photo) return;
-  const dataUrl = await renderPhotoForSave(photo);
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  const mimeType = isMobile ? "image/jpeg" : "image/png";
+  const extension = isMobile ? "jpg" : "png";
+  const dataUrl = await renderPhotoForSave(photo, mimeType);
   const link = document.createElement("a");
   link.href = dataUrl;
-  link.download = `instant-photo-${new Date(photo.createdAt).toISOString().slice(0, 10)}.png`;
+  link.download = `instant-photo-${new Date(photo.createdAt).toISOString().slice(0, 10)}.${extension}`;
   link.click();
 }
 
-function renderPhotoForSave(photo) {
+function renderPhotoForSave(photo, mimeType = "image/png") {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement("canvas");
     canvas.width = 980;
@@ -448,7 +451,7 @@ function renderPhotoForSave(photo) {
 
       drawExportPaperTexture(ctx, canvas.width, canvas.height);
 
-      resolve(canvas.toDataURL("image/png"));
+      resolve(mimeType === "image/jpeg" ? canvas.toDataURL(mimeType, 0.94) : canvas.toDataURL(mimeType));
     };
     img.src = photo.imageUrl;
   });
