@@ -415,8 +415,8 @@ async function saveSelectedPhoto() {
   const photo = photos.find((item) => item.id === selectedId) || photos.at(-1);
   if (!photo) return;
   const isMobile = window.matchMedia("(max-width: 720px)").matches;
-  const mimeType = isMobile ? "image/jpeg" : "image/png";
-  const extension = isMobile ? "jpg" : "png";
+  const mimeType = "image/png";
+  const extension = "png";
   const dataUrl = await renderPhotoForSave(photo, mimeType);
   const filename = `instant-photo-${new Date(photo.createdAt).toISOString().slice(0, 10)}.${extension}`;
 
